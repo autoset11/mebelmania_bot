@@ -27,11 +27,12 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 def get_telegram_button():
-    return InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="📱 Перейти в Telegram-канал", url=LINK_TELEGRAM)]
         ]
     )
+    return keyboard
 
 @dp.message(CommandStart(deep_link=True))
 async def start_with_payload(message: types.Message):
@@ -98,24 +99,15 @@ async def show_stats(message: types.Message):
     result += f"\n📈 ВСЕГО: {total}"
     await message.answer(result)
 
-# Webhook обработчик
 async def webhook(request):
     update = await request.json()
     await dp.feed_update(bot, types.Update(**update))
     return web.Response()
 
-async def on_startup():
-    webhook_url = f"https://mebelmania-bot.onrender.com/webhook"
-    await bot.set_webhook(webhook_url)
-    print(f"✅ Webhook установлен: {webhook_url}")
-
-async def on_shutdown():
-    await bot.delete_webhook()
-
-# Запуск
 app = web.Application()
 app.router.add_post("/webhook", webhook)
 app.router.add_get("/", lambda r: web.Response(text="OK"))
 
 if __name__ == "__main__":
-    web.run_app(app, host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    port = int(os.environ.get("PORT", 10000))
+    web.run_app(app, host="0.0.0.0", port=port)
