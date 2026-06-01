@@ -48,6 +48,9 @@ async def start_with_payload(message: types.Message):
     first_name = message.from_user.first_name
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
+    # ОТЛАДКА: пишем в консоль Render
+    print(f"🔍 Получен переход: метка={payload}, пользователь={user_id}, время={timestamp}")
+    
     if payload not in stats:
         stats[payload] = []
     
@@ -58,6 +61,10 @@ async def start_with_payload(message: types.Message):
         "timestamp": timestamp
     })
     save_stats(stats)
+    
+    # ОТЛАДКА: сколько всего записей
+    total = sum(len(v) for v in stats.values())
+    print(f"📊 Всего записей в статистике: {total}")
     
     await message.answer(
         f"👋 Спасибо, {first_name}!\n\n"
